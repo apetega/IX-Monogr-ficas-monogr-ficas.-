@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="gl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IX Xornada Monográfica de APETEGA</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --secondary: #00695c;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent: #e8f5e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Banda Blanca Superior */
+        .top-bar {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .top-bar-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #666666;
+            letter-spacing: 1px;
+        }
+
+        .top-bar-logo img {
+            height: 45px;
+            width: auto;
+            display: block;
+        }
+
+        /* Header Principal */
+        header {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        header h2 {
+            margin-top: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Nav & Tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            background-color: #e0e0e0;
+            padding: 5px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #555;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-btn.active {
+            background-color: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tab-content {
+            display: none;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Estilos Xerais de Contido */
+        h3 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Táboa de Horarios / Obradoiros */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .schedule-table th {
+            background-color: var(--accent);
+            color: var(--primary);
+        }
+
+        .workshop-title {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .speakers {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        /* Accordion Glosario */
+        .accordion-item {
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .accordion-header:hover {
+            background-color: var(--accent);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Sección Aula */
+        .classroom-card {
+            background-color: #fafafa;
+            border-left: 4px solid var(--primary-light);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .classroom-card h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+        }
+
+        /* Calculadora e Simulador IES */
+        .interactive-tool {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .interactive-tool {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .results-box {
+            background-color: var(--accent);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c8e6c9;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.75rem;
+            color: #777777;
+            background-color: #e0e0e0;
+            margin-top: 2rem;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Banda Blanca Superior Centrada -->
+    <div class="top-bar">
+        <span class="top-bar-title">APETEGA</span>
+        <a href="https://apetega.gal/sites/default/files/2022-07/logoapetega2.png" target="_blank" class="top-bar-logo">
+            <img src="https://apetega.gal/sites/default/files/2022-07/logoapetega2.png" alt="Logo APETEGA">
+        </a>
+    </div>
+
+    <!-- Cabecera Principal -->
+    <header>
+        <h1>IX Xornada Monográfica de APETEGA</h1>
+        <h2>Arquitectura bioclimática, bioconstrucións e urbanismo sostible</h2>
+    </header>
+
+    <div class="container">
+        <!-- Navegación por Lapelas -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-info')">Información xeral</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-obradoiros')">Obradoiros</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-glosario')">Glosario</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-recursos')">Recursos Centros</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-aula')">Aplicación na Aula</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-interactivo')">⚡ Simulador IES Galicia</button>
+        </div>
+
+        <!-- LAPELA 1: Información Xeral -->
+        <div id="tab-info" class="tab-content active">
+            <h3>Ubicación e Organización</h3>
+            <p><strong>Lugar de celebración:</strong> Alvarella Ecoturismo (Fragas do Eume)</p>
+            <p>Un espazo pioneiro en educación ambiental e bioconstrución en Galicia, ideal para explorar a arquitectura sostible en contornos reais.</p>
+            <p>👉 Visita a súa web oficial: <a href="https://alvarella.gal/" target="_blank">Alvarella Ecoturismo</a></p>
+            
+            <hr>
+
+            <h3>Data e Horario</h3>
+            <p>📅 <strong>Data:</strong> Sábado, 3 de Outubro de 2026</p>
+            <p>⏰ <strong>Horario:</strong> De 10:00 h a 20:00 h</p>
+
+            <hr>
+
+            <h3>Sobre APETEGA</h3>
+            <p>A <strong>Asociación do Profesorado de Tecnoloxía de Galicia (APETEGA)</strong> traballa polo desenvolvemento e mellora do ensino da tecnoloxía, a informática e a intelixencia artificial no ámbito educativo galego.</p>
+            <ul>
+                <li><strong>Web:</strong> <a href="https://apetega.gal" target="_blank">www.apetega.gal</a></li>
+                <li><strong>Contacto:</strong> contacto@apetega.gal</li>
+            </ul>
+        </div>
+
+        <!-- LAPELA 2: Obradoiros -->
+        <div id="tab-obradoiros" class="tab-content">
+            <h3>Programa de Obradoiros e Mesas Redondas</h3>
+
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Horario</th>
+                        <th>Actividade e Ponentes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>10:00 a 11:30 h</strong></td>
+                        <td>
+                            <div class="workshop-title">Obradoiro: "Alvarella: un exemplo de bioconstrución"</div>
+                            <div class="speakers">Impartido por: Equipamento de Alvarella Ecoturismo</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>11:30 a 12:00 h</strong></td>
+                        <td><strong>Aula Aberta:</strong> compartindo ideas e proxectos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>12:00 a 14:00 h</strong></td>
+                        <td>
+                            <div class="workshop-title">Obradoiro: "Formulación teórica e propostas prácticas sobre arquitectura e urbanismo no ensino secundario"</div>
+                            <div class="speakers">Impartido por: Ana Moreiras.</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>16:00 a 17:30 h</strong></td>
+                        <td>
+                            <div class="workshop-title">Mesa Redonda: "O cambio climático e o seu impacto nos centros educativos. Propostas de mitigación e protocolos"</div>
+                            <div class="speakers">moderado por <em>Daniel R. Pizarro<em>, con <em>Xosé Allegue<em> e <em>Begoña de Bernardo<em>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>17:30 a 18:00 h</strong></td>
+                        <td><strong>Aula Aberta:</strong> compartindo ideas e proxectos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>18:00 a 20:00 h</strong></td>
+                        <td>
+                            <div class="workshop-title">Obradoiro: "A domótica na arquitectura bioclimática"</div>
+                            <div class="speakers">Impartido por: Pablo Colodrón</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- LAPELA 3: Glosario -->
+        <div id="tab-glosario" class="tab-content">
+            <h3>Glosario Técnico de Arquitectura Sostible</h3>
+            <p><em>Preme sobre cada termo para ver a súa definición:</em></p>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">Passivhaus (Estándar de Casa Pasiva) <span>+</span></div>
+                <div class="accordion-content">
+                    Estándar de construción de edificios enerxéticamente eficientes, con gran illamento térmico, rigoroso control de infiltracións e máxima calidade do aire interior mediante ventilación mecánica con recuperación de calor.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">Arquitectura Bioclimática <span>+</span></div>
+                <div class="accordion-content">
+                    Deseño de edificios tendo en conta as condicións climáticas da contorna (sol, vexetación, choiva, ventos) para maximizar o confort térmico e reducir a necesidade de consumo enerxético artificial.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">Bioconstrución <span>+</span></div>
+                <div class="accordion-content">
+                    Sistemas de edificación que empregan materiais de moi baixo impacto ambiental ou orixe vexetal/local (madera, palla, terra, cal, corcho) respectando a saúde das persoas e o contorno.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">Domótica e Inmótica <span>+</span></div>
+                <div class="accordion-content">
+                    Conxunto de tecnoloxías aplicadas ao control e á automatización intelixente da vivenda ou edificio, permitindo unha xestión eficiente do uso da enerxía, seguridade e confort.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">Masa Térmica <span>+</span></div>
+                <div class="accordion-content">
+                    Capacidade dos materiais pesados (como pedra, ladrillo ou formigón) para absorber, almacenar e liberar calor lentamente, axudando a estabilizar a temperatura interior.
+                </div>
+            </div>
+        </div>
+
+        <!-- LAPELA 4: Recursos e Guía para Centros -->
+        <div id="tab-recursos" class="tab-content">
+            <h3>📚 Recursos e Guías de Sostibilidade para Centros Galegos</h3>
+            <p>Directrices e materiais prácticos para levar a xestión enerxética aos colexios e institutos de Galicia:</p>
+
+            <div class="classroom-card">
+                <h4>1. Protocolo de "Apagado Nocturno e Fin de Semana"</h4>
+                <p>Checklist rápida para os equipos directivos e conserxería:</p>
+                <ul>
+                    <li>Desconexión das regletas principais nas aulas de informática (evita o consumo pantasma de 30-50 PCs).</li>
+                    <li>Apagado completo de pantallas interactivas e proxectores (evitar modo <em>standby</em>).</li>
+                    <li>Revisión de termostatos de calefacción (baixar a 15ºC fóra do horario escolar).</li>
+                </ul>
+            </div>
+
+            <div class="classroom-card">
+                <h4>2. Creación das Patrullas Verdes ou "Comités EcoEficaces"</h4>
+                <p>Organizar ao alumnado de ESO e Bacharelato para realizar auditorías periódicas por aula (comprobar luces acesas sen necesidade, ventás abertas coa calefacción acesa, etc.).</p>
+            </div>
+
+            <div class="classroom-card">
+                <h4>3. Enlaces de Interese e Normativa</h4>
+                <ul>
+                    <li><a href="https://www.inega.gal/" target="_blank">INEGA (Instituto Galego de Enerxía)</a> - Recursos pedagóxicos e axudas para centros.</li>
+                    <li><a href="https://www.edu.xunta.gal/portal/" target="_blank">Portal Educativo da Xunta de Galicia</a> - Proxectos de mellora de eficiencia enerxética nos centros escolares.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- LAPELA 5: Aplicación na Aula -->
+        <div id="tab-aula" class="tab-content">
+            <h3>Transferencia ao Aula: Tecnoloxía, IA e TIC</h3>
+            <p>Propostas didácticas para trasladar os aprendizaxes dos obradoiros directamente ás materias de Tecnoloxía, Dixitalización e IA en Secundaria e Bacharelato:</p>
+
+            <div class="classroom-card">
+                <h4>1. Unidade Didáctica: Domótica con Arduino/ESP32 e Arquitectura Bioclimática</h4>
+                <p><strong>Materia:</strong> Tecnoloxía e Enxeñaría / Optativas de TIC (3º-4º ESO e Bacharelato).</p>
+                <p><strong>Actividade:</strong> Construción dunha maquetación de vivenda bioclimática monitorizada. Alumnado automatiza elementos como ventás segundo a temperatura e persianas segundo a luz do sol empregando sensores DHT11/LDR e servos.</p>
+            </div>
+
+            <div class="classroom-card">
+                <h4>2. Proxecto: Simulación e Deseño de Edificios Sostibles con IA e CAD</h4>
+                <p><strong>Materia:</strong> Tecnoloxía / IA e Sociedade (ESO e Bacharelato).</p>
+                <p><strong>Actividade:</strong> Emprego de ferramentas de Deseño Asistido por Ordenador (3D) para deseñar maquetas sostibles. Utilización de xeradores de IA para analizar o soleamento óptimo e propor materiais locais segundo a xeolocalización do centro.</p>
+            </div>
+
+            <div class="classroom-card">
+                <h4>3. Protocolos e Auditoría Enerxética no Centro Educativo</h4>
+                <p><strong>Materia:</strong> Tecnoloxía / Proxecto Interdisciplinar.</p>
+                <p><strong>Actividade:</strong> O alumnado utiliza sensores IoT de calidade do aire (CO₂, humidade e temperatura) para auditar a eficiencia do propio centro e propoñer melloras na ventilación e illamento ao equipo directivo.</p>
+            </div>
+        </div>
+
+        <!-- LAPELA 6: Simulador Interactivo IES Galicia -->
+        <div id="tab-interactivo" class="tab-content">
+            <h3>🏫 Simulador de Aforro Enerxético nun IES Galego</h3>
+            <p>Calcula o aforro económico e ecolóxico anual dun centro de Secundaria/Bacharelato en Galicia aplicando medidas básicas de apagado e xestión enerxética fora do horario escolar (175 días lectivos / 365 días ano).</p>
+
+            <div class="interactive-tool">
+                <div>
+                    <div class="input-group">
+                        <label for="num-pcs">Nº de ordenadores do instituto (Aulas Informática + Aulas):</label>
+                        <input type="number" id="num-pcs" value="120" min="10" max="500" oninput="updateSchoolChart()">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="pc-action">Acción sobre os ordenadores e monitorización:</label>
+                        <select id="pc-action" onchange="updateSchoolChart()">
+                            <option value="0">Deixalos acendidos / Stand-by toda a noite</option>
+                            <option value="0.85" selected>Apagado automático/regletas ás 15:00h (Aforro ~85%)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="num-classrooms">Nº de aulas con iluminación LED / Fluor:</label>
+                        <input type="number" id="num-classrooms" value="25" min="5" max="80" oninput="updateSchoolChart()">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="light-action">Control de iluminación nas aulas:</label>
+                        <select id="light-action" onchange="updateSchoolChart()">
+                            <option value="0">Luces esquecidas acesas con frecuencia nas noites/recreos</option>
+                            <option value="0.25" selected>Patrulla Verde / Apagado sistemático ao saír (Aforro ~25%)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="standby-action">Proxectores e Pantallas Interactivas (Stand-by):</label>
+                        <select id="standby-action" onchange="updateSchoolChart()">
+                            <option value="0">Stand-by constante fins de semana e noites</option>
+                            <option value="0.10" selected>Desconexión total de regletas (Aforro ~10%)</option>
+                        </select>
+                    </div>
+
+                    <div class="results-box">
+                        <h4 style="margin-top: 0; color: var(--primary);">📊 Impacto Anual Estimado no IES:</h4>
+                        <div class="metric-card">
+                            <span class="metric-title">Aforro Económico Anual:</span>
+                            <span class="metric-value" id="euro-savings">0 €</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">Enerxía Aforrada:</span>
+                            <span class="metric-value" id="kwh-savings">0 kWh</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">Emisións CO₂ evitas:</span>
+                            <span class="metric-value" id="co2-savings">0 kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4>Consumo Eléctrico Anual Estimado (kWh)</h4>
+                    <canvas id="schoolEnergyChart" style="max-width: 100%; height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página -->
+    <footer>
+        Este sitio web foi creado empregando Intelixencia Artificial.
+    </footer>
+
+    <script>
+        // Función para cambiar de lapela
+        function openTab(evt, tabName) {
+            let tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            let tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Accordion para o glosario
+        function toggleAccordion(element) {
+            let content = element.nextElementSibling;
+            let icon = element.querySelector("span");
+            
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                icon.innerText = "+";
+            } else {
+                content.style.display = "block";
+                icon.innerText = "-";
+            }
+        }
+
+        // Lóxica do Gráfico interactivo do IES
+        let schoolEnergyChart;
+        const COST_KWH = 0.20; // Prezo medio do kWh en €
+        const CO2_FACTOR = 0.25; // kg de CO2 por kWh en España/Galicia
+
+        window.onload = function() {
+            const ctx = document.getElementById('schoolEnergyChart').getContext('2d');
+            schoolEnergyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Consumo Sen Control', 'Consumo Eficiente'],
+                    datasets: [{
+                        label: 'Consumo Eléctrico (kWh/ano)',
+                        data: [0, 0],
+                        backgroundColor: ['#e57373', '#81c784'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            updateSchoolChart();
+        };
+
+        function updateSchoolChart() {
+            let pcs = parseInt(document.getElementById('num-pcs').value) || 0;
+            let pcFactor = parseFloat(document.getElementById('pc-action').value);
+            let classrooms = parseInt(document.getElementById('num-classrooms').value) || 0;
+            let lightFactor = parseFloat(document.getElementById('light-action').value);
+            let standbyFactor = parseFloat(document.getElementById('standby-action').value);
+
+            // Cálculos aproximados
+            let pcBaseKwh = pcs * 120; 
+            let lightBaseKwh = classrooms * 180;
+            let standbyBaseKwh = (pcs + classrooms) * 15;
+
+            let totalBaseKwh = pcBaseKwh + lightBaseKwh + standbyBaseKwh;
+            
+            let pcSaved = pcBaseKwh * pcFactor;
+            let lightSaved = lightBaseKwh * lightFactor;
+            let standbySaved = standbyBaseKwh * standbyFactor;
+
+            let totalSavedKwh = pcSaved + lightSaved + standbySaved;
+            let totalEfficientKwh = totalBaseKwh - totalSavedKwh;
+
+            let euroSavings = totalSavedKwh * COST_KWH;
+            let co2Savings = totalSavedKwh * CO2_FACTOR;
+
+            document.getElementById('euro-savings').innerText = Math.round(euroSavings) + " €";
+            document.getElementById('kwh-savings').innerText = Math.round(totalSavedKwh) + " kWh";
+            document.getElementById('co2-savings').innerText = Math.round(co2Savings) + " kg";
+
+            if (schoolEnergyChart) {
+                schoolEnergyChart.data.datasets[0].data = [Math.round(totalBaseKwh), Math.round(totalEfficientKwh)];
+                schoolEnergyChart.update();
+            }
+        }
+    </script>
+</body>
+</html>
